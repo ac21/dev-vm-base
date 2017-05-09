@@ -2,4 +2,4 @@
 #ignore vagrant build output files
 .vagrant/*
 *.box
-
+*.dev
