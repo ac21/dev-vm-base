@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
 
   config.vm.provider "virtualbox" do |vb|
-      vb.name = "dev-vm-ruby5-base"
+      vb.name = "dev-vm-rails5-base"
       vb.memory = "2048"
       vb.cpus = 2
   end
@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../", "/home/ubuntu/repos"
 
   config.ssh.forward_agent = true
-  #config.ssh.insert_key = false
+  config.ssh.insert_key = false
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
