@@ -18,8 +18,7 @@ Base Configuration is:
 4. Install VBGuest to keep Guest Additions in sync.  `vagrant plugin install vagrant-vbguest`
 5. start vagrant with `vagrant up` to download and configure the box image
 6. Login into vagrant using 'vagrant ssh`
-7. run setup with `/vagrant/setup/setup.sh`
 
-## Create new box and upload it
+## Update box configuration and upload it
 
-1. run `make package`
+1. run `BOX_VERSION=[VERSION] make upload_new_version`

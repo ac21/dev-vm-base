@@ -83,10 +83,10 @@ Vagrant.configure("2") do |config|
     export PATH=$HOME/.rbenv/bin:$PATH
     eval "$(rbenv init -)"
 
-    #rbenv install 2.2.3
-    #rbenv install 2.3.4
-    #rbenv install 2.4.1
-    #rbenv global 2.4.1
+    rbenv install 2.2.3
+    rbenv install 2.3.4
+    rbenv install 2.4.1
+    rbenv global 2.4.1
 
     rbenv rehash
 
@@ -99,11 +99,14 @@ Vagrant.configure("2") do |config|
     mv ~/.vim/vimrc ~/.vimrc
     mkdir ~/.vim/colors
     curl -sL https://github.com/sjl/badwolf/raw/master/colors/badwolf.vim > ~/.vim/colors/badwolf.vim
-    sed -i '/colorscheme github/c\\colorscheme badwolf' ~/.vimrc
+    sed -i 's/colorscheme github/colorscheme badwolf/g' ~/.vimrc
     sed -i "/vim-gutentags/d" ~/.vimrc
     vim +PluginInstall +qall
 
     # setup tmux
     cp /vagrant/setup/.tmux.conf ~/.
+
+    #update default shell to zsh
+    sudo sed -i -e 's|/home/vagrant:/bin/bash|/home/vagrant:/usr/bin/zsh|g' /etc/passwd
   SCRIPT
 end

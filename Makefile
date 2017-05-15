@@ -16,7 +16,7 @@ package:
 clean:
 	rm *.box
 
-upload_new_version: create_version_and_provider upload_file
+upload_new_version: package create_version_and_provider upload_file
 	echo "upload completed"
 
 create_version_and_provider:
