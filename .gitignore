@@ -3,3 +3,11 @@
 .vagrant/*
 *.box
 *.dev
+
+
+# ignore ruby files
+Gemfile.lock
+
+
+# misc
+scratch/*

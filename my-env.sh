@@ -9,5 +9,4 @@ alias bu='bundle update'
 alias bs='bundle show'
 alias ls='ls --color=auto -G'
 alias ll='ls --color=auto -G -al'
-alias tmux_base='tmux new-session "tmux source-file $VAGRANT/.tmux_session"'
 

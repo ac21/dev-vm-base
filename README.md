@@ -19,3 +19,7 @@ Base Configuration is:
 5. start vagrant with `vagrant up` to download and configure the box image
 6. Login into vagrant using 'vagrant ssh`
 7. run setup with `/vagrant/setup/setup.sh`
+
+## Create new box and upload it
+
+1. run `make package`
