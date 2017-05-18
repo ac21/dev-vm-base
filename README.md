@@ -8,7 +8,7 @@ Base Configuration is:
 2. Ruby 2.4
 3. Rails 5.1
 4. Postgres 9.5
-
+5. Redis 3.2.9
 
 ## Setup
 
