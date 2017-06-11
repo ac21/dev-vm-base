@@ -21,6 +21,8 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
+    # update packages
+    apt-get update -y
     #shell and rbenv dependencies
     apt-get install -y build-essential zsh zsh-syntax-highlighting
 
@@ -30,17 +32,20 @@ Vagrant.configure("2") do |config|
     # sqllite, nodejs and yaml libraries
     apt-get install -y libyaml-dev libsqlite3-dev sqlite3 nodejs
 
-    #postgres & redis
+    # postgres & redis
     apt-get install -y postgresql-9.5 postgresql-common libpq-dev redis-server
 
-    #config postgres for md5 login locally
-    sudo sed -i '90d' /etc/postgresql/9.5/main/pg_hba.conf
-    sudo sed -i '90ilocal   all             all                                     md5' /etc/postgresql/9.5/main/pg_hba.conf
+    # config postgres for md5 login locally
+    sed -i -E 's/(local.+all.+all.+)peer/\1md5/g' /etc/postgresql/9.5/main/pg_hba.conf
+
+    # conf postgres to be accessible by host system
+    sed -i -E 's|(host.+all.+all.+)127.0.0.1/32|\1  0.0.0.0/0 |g' /etc/postgresql/9.5/main/pg_hba.conf
+    sed -i "59ilisten_addresses = '*'" /etc/postgresql/9.5/main/postgresql.conf
 
     #compres file as much as possible
-    sudo apt-get clean
-    sudo dd if=/dev/zero of=/EMPTY bs=1M
-    sudo rm -f /EMPTY
+    apt-get clean
+    dd if=/dev/zero of=/EMPTY bs=1M
+    rm -f /EMPTY
   SHELL
 
   config.vm.provision "shell", privileged: false, inline: <<-SCRIPT
