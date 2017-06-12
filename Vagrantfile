@@ -41,11 +41,6 @@ Vagrant.configure("2") do |config|
     # conf postgres to be accessible by host system
     sed -i -E 's|(host.+all.+all.+)127.0.0.1/32|\1  0.0.0.0/0 |g' /etc/postgresql/9.5/main/pg_hba.conf
     sed -i "59ilisten_addresses = '*'" /etc/postgresql/9.5/main/postgresql.conf
-
-    #compres file as much as possible
-    apt-get clean
-    dd if=/dev/zero of=/EMPTY bs=1M
-    rm -f /EMPTY
   SHELL
 
   config.vm.provision "shell", privileged: false, inline: <<-SCRIPT
@@ -88,5 +83,10 @@ Vagrant.configure("2") do |config|
 
     #update default shell to zsh
     sudo sed -i -e 's|/home/vagrant:/bin/bash|/home/vagrant:/usr/bin/zsh|g' /etc/passwd
+
+    #compress file as much as possible
+    sudo apt-get clean
+    sudo dd if=/dev/zero of=/EMPTY bs=1M
+    sudo rm -f /EMPTY
   SCRIPT
 end
