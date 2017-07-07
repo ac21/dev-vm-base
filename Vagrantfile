@@ -8,8 +8,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
       vb.name = "dev-vm-rails5-base"
-      vb.memory = "2048"
-      vb.cpus = 2
+      vb.memory = "2560"
+      vb.cpus = 1
+      vb.customize ['modifyvm', :id, '--vram', '16']
+      vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 5000 ]
   end
 
   config.vm.synced_folder "../", "/home/vagrant/repos"
