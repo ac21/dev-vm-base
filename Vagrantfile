@@ -36,7 +36,17 @@ Vagrant.configure("2") do |config|
     apt-get install -y libssl-dev libreadline-dev zlib1g-dev
 
     # sqllite, nodejs and yaml libraries
-    apt-get install -y libyaml-dev libsqlite3-dev sqlite3 nodejs
+    apt-get install -y libyaml-dev libsqlite3-dev sqlite3
+
+    # install v6 of node.js
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    apt-get install -y nodejs
+
+    # install yarn to enable webpack
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+    apt-get update && apt-get install -y yarn
 
     # postgres & redis
     apt-get install -y postgresql-9.5 postgresql-common libpq-dev redis-server
