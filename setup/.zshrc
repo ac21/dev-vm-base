@@ -78,3 +78,6 @@ source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 if [ -e "$VAGRANT/my-env.sh" ]; then
   source "$VAGRANT/my-env.sh"
 fi
+
+# set up custom shortcuts
+export PATH=$PATH:/vagrant/bin

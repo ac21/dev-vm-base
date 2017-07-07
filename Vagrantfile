@@ -25,7 +25,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     # update packages
     apt-get update -y
-    #shell and rbenv dependencies
+
+    # install DKMS for virtual box
+    apt-get install -y virtualbox-dkms
+
+    # shell and rbenv dependencies
     apt-get install -y build-essential zsh zsh-syntax-highlighting
 
     # ruby dependencies
@@ -43,6 +47,13 @@ Vagrant.configure("2") do |config|
     # conf postgres to be accessible by host system
     sed -i -E 's|(host.+all.+all.+)127.0.0.1/32|\1  0.0.0.0/0 |g' /etc/postgresql/9.5/main/pg_hba.conf
     sed -i "59ilisten_addresses = '*'" /etc/postgresql/9.5/main/postgresql.conf
+
+    # add current heroku tools
+    sudo apt-get install software-properties-common
+    sudo add-apt-repository "deb https://cli-assets.heroku.com/branches/stable/apt ./"
+    curl -L https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install heroku
   SHELL
 
   config.vm.provision "shell", privileged: false, inline: <<-SCRIPT
@@ -59,6 +70,7 @@ Vagrant.configure("2") do |config|
     cd ~/.rbenv && src/configure && make -C src && cd ~
 
     export PATH=$HOME/.rbenv/bin:$PATH
+
     eval "$(rbenv init -)"
 
     rbenv install 2.2.3
