@@ -26,6 +26,9 @@ Vagrant.configure("2") do |config|
     # update packages
     apt-get update -y
 
+    # upgrade packages asap
+    apt-get upgrade -y
+
     # install DKMS for virtual box
     apt-get install -y virtualbox-dkms
 
@@ -52,10 +55,10 @@ Vagrant.configure("2") do |config|
     apt-get install -y postgresql-9.5 postgresql-common libpq-dev redis-server
 
     # config postgres for md5 login locally
-    sed -i -E 's/(local.+all.+all.+)peer/\1md5/g' /etc/postgresql/9.5/main/pg_hba.conf
+    sed -i -E 's/(local.+all.+all.+)peer/\\1md5/g' /etc/postgresql/9.5/main/pg_hba.conf
 
     # conf postgres to be accessible by host system
-    sed -i -E 's|(host.+all.+all.+)127.0.0.1/32|\1  0.0.0.0/0 |g' /etc/postgresql/9.5/main/pg_hba.conf
+    sed -i -E 's/(host.+all.+all.+)127.0.0.1/32/\\1  0.0.0.0/0 /g' /etc/postgresql/9.5/main/pg_hba.conf
     sed -i "59ilisten_addresses = '*'" /etc/postgresql/9.5/main/postgresql.conf
 
     # add current heroku tools
@@ -83,7 +86,6 @@ Vagrant.configure("2") do |config|
 
     eval "$(rbenv init -)"
 
-    rbenv install 2.2.3
     rbenv install 2.3.4
     rbenv install 2.4.1
     rbenv global 2.4.1
@@ -93,13 +95,12 @@ Vagrant.configure("2") do |config|
     # install bundler
     gem install bundler
 
-    git clone https://github.com/scrooloose/vimfiles.git ~/.vim
+    git clone https://github.com/ac21/vimfiles.git ~/.vim
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    mv ~/.vim/vimrc ~/.vimrc
+    ln -s ~/.vim/vimrc ~/.vimrc
     mkdir ~/.vim/colors
     curl -sL https://github.com/sjl/badwolf/raw/master/colors/badwolf.vim > ~/.vim/colors/badwolf.vim
     sed -i 's/colorscheme github/colorscheme badwolf/g' ~/.vimrc
-    sed -i "/vim-gutentags/d" ~/.vimrc
     vim +PluginInstall +qall
 
     # setup tmux
