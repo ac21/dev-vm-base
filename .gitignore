@@ -4,7 +4,7 @@
 .vagrant/*
 *.box
 *.dev
-
+*.env
 
 # ignore ruby files
 Gemfile.lock

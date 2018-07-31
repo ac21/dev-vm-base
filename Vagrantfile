@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
       vb.name = "dev-vm-rails5-base"
-      vb.memory = "2560"
+      vb.memory = "2048"
       vb.cpus = 1
       vb.customize ['modifyvm', :id, '--vram', '16']
       vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 5000 ]
@@ -22,7 +22,9 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision "shell",
+                      env: { DEBIAN_FRONTEND: "noninteractive" },
+                      inline: <<-SHELL
     # update packages
     apt-get update -y
 
@@ -38,18 +40,14 @@ Vagrant.configure("2") do |config|
     # ruby dependencies
     apt-get install -y libssl-dev libreadline-dev zlib1g-dev
 
-    # sqllite, nodejs and yaml libraries
+    # sqllite and yaml libraries
     apt-get install -y libyaml-dev libsqlite3-dev sqlite3
-
-    # install v6 of node.js
-    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-    apt-get install -y nodejs
 
     # install yarn to enable webpack
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-    apt-get update && apt-get install -y yarn
+    apt-get update -y && apt-get install -y yarn
 
     # postgres & redis
     apt-get install -y postgresql-9.5 postgresql-common libpq-dev redis-server
@@ -58,24 +56,36 @@ Vagrant.configure("2") do |config|
     sed -i -E 's/(local.+all.+all.+)peer/\\1md5/g' /etc/postgresql/9.5/main/pg_hba.conf
 
     # conf postgres to be accessible by host system
-    sed -i -E 's/(host.+all.+all.+)127.0.0.1/32/\\1  0.0.0.0/0 /g' /etc/postgresql/9.5/main/pg_hba.conf
+    sed -i -E 's|(host.+all.+all.+)127.0.0.1/32|\\10.0.0.0/0   |g' /etc/postgresql/9.5/main/pg_hba.conf
     sed -i "59ilisten_addresses = '*'" /etc/postgresql/9.5/main/postgresql.conf
 
     # add current heroku tools
-    sudo apt-get install software-properties-common
+    sudo apt-get install -y software-properties-common
     sudo add-apt-repository "deb https://cli-assets.heroku.com/branches/stable/apt ./"
-    curl -L https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
-    sudo apt-get update
-    sudo apt-get install heroku
+    curl -sSL https://cli-assets.heroku.com/apt/release.key | sudo apt-key add -
+    sudo apt-get update -y
+    sudo apt-get install -y  heroku
   SHELL
 
-  config.vm.provision "shell", privileged: false, inline: <<-SCRIPT
+  config.vm.provision "shell",
+                      privileged: false,
+                      env: { DEBIAN_FRONTEND: "noninteractive" },
+                      inline: <<-SCRIPT
     # configure ZSH and make default prompt
     cp /vagrant/setup/.zshrc ~/.
     mkdir ~/.bin
-    curl -sL https://github.com/djl/vcprompt/raw/master/bin/vcprompt > ~/.bin/vcprompt
+    curl -sSL https://github.com/djl/vcprompt/raw/master/bin/vcprompt > ~/.bin/vcprompt
     chmod 755 ~/.bin/vcprompt
     ln -s /usr/bin/python3 $HOME/.bin/python
+
+    # install Node Version Manager; works as of pre-v0.33.12
+    curl -sSLo- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | sh
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+    # install Node v8
+    # nvm install --no-progress v8.10.0  # awaiting v0.33.12
+    nvm install v8.10.0
 
     # configure rbenv and install ruby versions
     git clone https://github.com/rbenv/rbenv.git ~/.rbenv
@@ -88,20 +98,24 @@ Vagrant.configure("2") do |config|
 
     rbenv install 2.3.4
     rbenv install 2.4.1
-    rbenv global 2.4.1
+    rbenv install 2.5.1
+    rbenv global 2.5.1
 
     rbenv rehash
 
     # install bundler
     gem install bundler
 
+    # load foreman for running Procfiles
+    gem install foreman
+
     git clone https://github.com/ac21/vimfiles.git ~/.vim
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     ln -s ~/.vim/vimrc ~/.vimrc
     mkdir ~/.vim/colors
-    curl -sL https://github.com/sjl/badwolf/raw/master/colors/badwolf.vim > ~/.vim/colors/badwolf.vim
+    curl -sSL https://github.com/sjl/badwolf/raw/master/colors/badwolf.vim > ~/.vim/colors/badwolf.vim
     sed -i 's/colorscheme github/colorscheme badwolf/g' ~/.vimrc
-    vim +PluginInstall +qall
+    vim +PluginInstall +qall &> /dev/null
 
     # setup tmux
     cp /vagrant/setup/.tmux.conf ~/.
